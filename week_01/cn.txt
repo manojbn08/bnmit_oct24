@@ -1,0 +1,503 @@
+# Create Simulator
+set ns [new Simulator]
+
+# Open trace files
+set nf [open PA1.nam w]
+$ns namtrace-all $nf
+set tf [open PA1.tr w]
+$ns trace-all $tf
+
+# Finish procedure
+proc finish { } {
+    global ns nf tf
+    $ns flush-trace
+    close $nf
+    close $tf
+    exec nam PA1.nam &
+    exit 0
+}
+
+# Create nodes
+set n0 [$ns node]
+set n2 [$ns node]
+set n3 [$ns node]
+
+# Create duplex links with different bandwidths and queue size
+$ns duplex-link $n0 $n2 200Mb 10ms DropTail
+$ns duplex-link $n2 $n3 1Mb 1000ms DropTail
+$ns queue-limit $n0 $n2 10
+
+# Attach UDP Agent on n0
+set udp0 [new Agent/UDP]
+$ns attach-agent $n0 $udp0
+
+# Attach Null Agent on n3 (Receiver)
+set null0 [new Agent/Null]
+$ns attach-agent $n3 $null0
+
+# Connect agents
+$ns connect $udp0 $null0
+
+# Attach CBR Traffic generator
+set cbr0 [new Application/Traffic/CBR]
+$cbr0 set packetSize_ 500
+$cbr0 set interval_ 0.005
+$cbr0 attach-agent $udp0
+
+# Schedule events
+$ns at 0.1 "$cbr0 start"
+$ns at 1.0 "finish"
+
+# Run simulation
+$ns run
+
+
+
+
+BEGIN {
+    c=0;
+}
+{
+    if($1=="d") {                # 'd' means packet dropped
+        c++;
+        printf("%s\t%s\n",$5,$11);
+    }
+}
+END {
+    printf("The number of packets dropped = %d\n",c);
+}
+
+
+
+
+
+
+--------------------------------------------------------------
+--------------------------------------------------------------
+
+
+
+set ns [ new Simulator ]
+set nf [ open lab4.nam w ]
+$ns namtrace-all $nf
+set tf [ open lab4.tr w ]
+$ns trace-all $tf
+
+set n0 [$ns node]
+set n1 [$ns node]
+set n2 [$ns node]
+set n3 [$ns node]
+set n4 [$ns node]
+set n5 [$ns node]
+
+$ns duplex-link $n0 $n4 1005Mb 1ms DropTail
+$ns duplex-link $n1 $n4 50Mb 1ms DropTail
+$ns duplex-link $n2 $n4 2000Mb 1ms DropTail
+$ns duplex-link $n3 $n4 200Mb 1ms DropTail
+$ns duplex-link $n4 $n5 1Mb 1ms DropTail
+
+set p1 [new Agent/Ping] ;# letters A and P should be capital
+$ns attach-agent $n0 $p1
+$p1 set packetSize_ 50000
+$p1 set interval_ 0.0001
+
+set p2 [new Agent/Ping] ;# letters A and P should be capital
+$ns attach-agent $n1 $p2
+
+set p3 [new Agent/Ping] ;# letters A and P should be capital
+$ns attach-agent $n2 $p3
+$p3 set packetSize_ 30000
+$p3 set interval_ 0.00001
+
+set p4 [new Agent/Ping] ;# letters A and P should be capital
+$ns attach-agent $n3 $p4
+
+set p5 [new Agent/Ping] ;# letters A and P should be capital
+$ns attach-agent $n5 $p5
+
+$ns queue-limit $n0 $n4 5
+$ns queue-limit $n2 $n4 3
+$ns queue-limit $n4 $n5 2
+
+Agent/Ping instproc recv {from rtt} {
+    $self instvar node_
+    puts "node [$node_ id]received answer from $from with round trip time $rtt msec"
+}
+
+$ns connect $p1 $p5
+$ns connect $p3 $p4
+
+# Schedule ping sends for p1
+$ns at 0.1 "$p1 send"
+$ns at 0.2 "$p1 send"
+$ns at 0.3 "$p1 send"
+$ns at 0.4 "$p1 send"
+$ns at 0.5 "$p1 send"
+$ns at 0.6 "$p1 send"
+$ns at 0.7 "$p1 send"
+$ns at 0.8 "$p1 send"
+$ns at 0.9 "$p1 send"
+$ns at 1.0 "$p1 send"
+$ns at 1.1 "$p1 send"
+$ns at 1.2 "$p1 send"
+$ns at 1.3 "$p1 send"
+$ns at 1.4 "$p1 send"
+$ns at 1.5 "$p1 send"
+$ns at 1.6 "$p1 send"
+$ns at 1.7 "$p1 send"
+$ns at 1.8 "$p1 send"
+$ns at 1.9 "$p1 send"
+$ns at 2.0 "$p1 send"
+$ns at 2.1 "$p1 send"
+$ns at 2.2 "$p1 send"
+$ns at 2.3 "$p1 send"
+$ns at 2.4 "$p1 send"
+$ns at 2.5 "$p1 send"
+$ns at 2.6 "$p1 send"
+$ns at 2.7 "$p1 send"
+$ns at 2.8 "$p1 send"
+$ns at 2.9 "$p1 send"
+
+# Schedule ping sends for p3
+$ns at 0.1 "$p3 send"
+$ns at 0.2 "$p3 send"
+$ns at 0.3 "$p3 send"
+$ns at 0.4 "$p3 send"
+$ns at 0.5 "$p3 send"
+$ns at 0.6 "$p3 send"
+$ns at 0.7 "$p3 send"
+$ns at 0.8 "$p3 send"
+$ns at 0.9 "$p3 send"
+$ns at 1.0 "$p3 send"
+$ns at 1.1 "$p3 send"
+$ns at 1.2 "$p3 send"
+$ns at 1.3 "$p3 send"
+$ns at 1.4 "$p3 send"
+$ns at 1.5 "$p3 send"
+$ns at 1.6 "$p3 send"
+$ns at 1.7 "$p3 send"
+$ns at 1.8 "$p3 send"
+$ns at 1.9 "$p3 send"
+$ns at 2.0 "$p3 send"
+$ns at 2.1 "$p3 send"
+$ns at 2.2 "$p3 send"
+$ns at 2.3 "$p3 send"
+$ns at 2.4 "$p3 send"
+$ns at 2.5 "$p3 send"
+$ns at 2.6 "$p3 send"
+$ns at 2.7 "$p3 send"
+$ns at 2.8 "$p3 send"
+$ns at 2.9 "$p3 send"
+
+$ns at 3.0 "finish"
+
+proc finish { } {
+    global ns nf tf
+    $ns flush-trace
+    close $nf
+    close $tf
+    exec nam lab4.nam &
+    exit 0
+}
+
+$ns run
+
+
+
+
+BEGIN {
+    drop = 0;
+}
+{
+    if ($1 == "d") {
+        drop++;
+    }
+}
+END {
+    printf("Total number of %s packets dropped due to congestion = %d\n", $5, drop);
+}
+
+
+
+
+
+
+--------------------------------------------------------------
+--------------------------------------------------------------
+
+
+
+
+
+set ns [new Simulator]
+
+# Trace files
+set tf [open lab3.tr w]
+$ns trace-all $tf
+set nf [open lab3.nam w]
+$ns namtrace-all $nf
+
+# Create nodes
+set n0 [$ns node]
+$n0 color "magenta"
+$n0 label "src1"
+
+set n1 [$ns node]
+
+set n2 [$ns node]
+$n2 color "magenta"
+$n2 label "src2"
+
+set n3 [$ns node]
+$n3 color "blue"
+$n3 label "dest2"
+
+set n4 [$ns node]
+
+set n5 [$ns node]
+$n5 color "blue"
+$n5 label "dest1"
+
+# Create LAN and duplex link
+$ns make-lan "$n0 $n1 $n2 $n3 $n4" 100Mb 100ms LL Queue/DropTail Mac/802_3
+$ns duplex-link $n4 $n5 1Mb 1ms DropTail
+
+# First TCP flow
+set tcp0 [new Agent/TCP]
+$ns attach-agent $n0 $tcp0
+
+set ftp0 [new Application/FTP]
+$ftp0 attach-agent $tcp0
+$ftp0 set packetSize_ 500
+$ftp0 set interval_ 0.0001
+
+set sink0 [new Agent/TCPSink]
+$ns attach-agent $n5 $sink0
+$ns connect $tcp0 $sink0
+
+# Second TCP flow
+set tcp1 [new Agent/TCP]
+$ns attach-agent $n2 $tcp1
+
+set ftp1 [new Application/FTP]
+$ftp1 attach-agent $tcp1
+$ftp1 set packetSize_ 600
+$ftp1 set interval_ 0.001
+
+set sink1 [new Agent/TCPSink]
+$ns attach-agent $n3 $sink1
+$ns connect $tcp1 $sink1
+
+# TCP tracing
+set file1 [open tcp0_cwnd.tr w]
+$tcp0 attach $file1
+set file2 [open tcp1_cwnd.tr w]
+$tcp1 attach $file2
+$tcp0 trace cwnd_
+$tcp1 trace cwnd_
+
+# Finish procedure
+proc finish { } {
+    global ns nf tf
+    $ns flush-trace
+    close $tf
+    close $nf
+    exec nam lab3.nam &
+    exit 0
+}
+
+# Schedule events
+$ns at 0.1 "$ftp0 start"
+$ns at 5 "$ftp0 stop"
+$ns at 7 "$ftp0 start"
+
+$ns at 0.2 "$ftp1 start"
+$ns at 8 "$ftp1 stop"
+$ns at 10 "$ftp1 start"
+$ns at 15 "$ftp1 stop"
+
+$ns at 16 "finish"
+
+# Run simulation
+$ns run
+
+
+
+
+import java.util.*;
+
+public class BellmanFord {
+    public static void main(String[] args) {
+        Scanner in = new Scanner(System.in);
+
+        System.out.print("Enter number of vertices: ");
+        int V = in.nextInt();
+
+        System.out.print("Enter number of edges: ");
+        int E = in.nextInt();
+
+        int[] src = new int[E], dest = new int[E], weight = new int[E];
+        for (int i = 0; i < E; i++) {
+            System.out.print("Enter edge " + (i + 1) + " (src dest weight): ");
+            src[i] = in.nextInt();
+            dest[i] = in.nextInt();
+            weight[i] = in.nextInt();
+        }
+
+        System.out.print("Enter source vertex: ");
+        int source = in.nextInt();
+
+        int[] dist = new int[V];
+        for (int i = 0; i < V; i++)
+            dist[i] = 999999; // use large value instead of Integer.MAX_VALUE
+        dist[source] = 0;
+
+        for (int i = 1; i < V; i++) {
+            for (int j = 0; j < E; j++) {
+                if (dist[src[j]] != 999999 && dist[src[j]] + weight[j] < dist[dest[j]])
+                    dist[dest[j]] = dist[src[j]] + weight[j];
+            }
+        }
+
+        for (int j = 0; j < E; j++) {
+            if (dist[src[j]] != 999999 && dist[src[j]] + weight[j] < dist[dest[j]]) {
+                System.out.println("Negative weight cycle detected");
+                return;
+            }
+        }
+
+        System.out.println("\nVertex\tDistance from Source " + source);
+        for (int i = 0; i < V; i++)
+            System.out.println(i + "\t\t" + (dist[i] == 999999 ? "∞" : dist[i]));
+    }
+}
+
+
+
+
+
+
+----------------------------------------------------------------------------------------------------------------------------
+
+
+
+import java.util.*;
+
+public class SimpleCRC_NoPrint {
+    public static void main(String[] args) {
+        Scanner in = new Scanner(System.in);
+
+        // Step 1: Input data bits
+        System.out.print("Enter number of data bits: ");
+        int n = in.nextInt();
+        int[] data = new int[n];
+        System.out.println("Enter data bits: ");
+        for (int i = 0; i < n; i++)
+            data[i] = in.nextInt();
+
+        // Step 2: Input divisor bits
+        System.out.print("Enter number of divisor bits: ");
+        int m = in.nextInt();
+        int[] divisor = new int[m];
+        System.out.println("Enter divisor bits: ");
+        for (int i = 0; i < m; i++)
+            divisor[i] = in.nextInt();
+
+        // Step 3: Append (m-1) zeros to data
+        int[] dividend = new int[n + m - 1];
+        for (int i = 0; i < n; i++)
+            dividend[i] = data[i];
+
+        // Step 4: Perform division
+        int[] remainder = divide(dividend.clone(), divisor);
+        int[] crc = new int[m - 1];
+        for (int i = 0; i < m - 1; i++)
+            crc[i] = remainder[n + i];
+
+        // Step 5: Display CRC bits
+        System.out.print("CRC bits: ");
+        for (int bit : crc)
+            System.out.print(bit);
+        System.out.println();
+
+        // Step 6: Receiver side
+        System.out.println("Enter received codeword (data + CRC): ");
+        int[] recv = new int[n + m - 1];
+        for (int i = 0; i < recv.length; i++)
+            recv[i] = in.nextInt();
+
+        // Step 7: Check for error
+        int[] remCheck = divide(recv, divisor);
+        boolean error = false;
+        for (int bit : remCheck)
+            if (bit != 0)
+                error = true;
+
+        // Step 8: Output result
+        System.out.println(error ? "Error detected in received codeword!" : "No error detected!");
+        in.close();
+    }
+
+    // Binary Division (XOR)
+    static int[] divide(int[] dividend, int[] divisor) {
+        for (int i = 0; i <= dividend.length - divisor.length; i++) {
+            if (dividend[i] == 1) {
+                for (int j = 0; j < divisor.length; j++)
+                    dividend[i + j] ^= divisor[j];
+            }
+        }
+        return dividend;
+    }
+}
+
+
+
+----------------------------------------------------------------------------------------------------------------------------
+
+
+import java.util.*;
+
+class Queue {
+    int q[], f = 0, r = 0;
+
+    void insert(int n) {
+        Scanner in = new Scanner(System.in);
+        q = new int[10]; // Bucket capacity = 10
+
+        for (int i = 0; i < n; i++) {
+            System.out.print("Enter element " + (i + 1) + ": ");
+            int ele = in.nextInt();
+
+            if (r >= 10) {
+                System.out.println("Bucket full, Lost Packet: " + ele);
+                break;
+            } else {
+                q[r++] = ele;
+            }
+        }
+    }
+
+    void delete() {
+        if (r == 0)
+            System.out.println("Bucket empty");
+        else {
+            for (int i = f; i < r; i++) {
+                try { Thread.sleep(1000); } catch (Exception e) {}
+                System.out.println("Leaked Packet: " + q[i]);
+            }
+        }
+    }
+}
+
+public class Leaky {
+    public static void main(String[] args) {
+        Scanner src = new Scanner(System.in);
+        Queue q = new Queue();
+
+        System.out.print("Enter number of packets to send: ");
+        int size = src.nextInt();
+
+        q.insert(size);
+        q.delete();
+    }
+}
